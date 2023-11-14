@@ -1,7 +1,7 @@
-#include "layer_helpers.h"
+#include "layer_utils.h"
 
-#ifdef MARIUS_CUDA
-    #include "pytorch_scatter/segment_max.h"
+#ifdef CELERITAS_CUDA
+    #include "GPU/segment_max.h"
 #endif
 
 torch::Tensor segment_ids_from_offsets(torch::Tensor segment_offsets, int64_t input_size) {
@@ -32,7 +32,7 @@ torch::Tensor segmented_max_with_offsets(torch::Tensor tensor, torch::Tensor seg
     shape[0] = segment_offsets.size(0);
     torch::Tensor out = torch::zeros(shape, tensor.options());
 
-    #ifdef MARIUS_CUDA
+    #ifdef CELERITASS_CUDA
         return std::get<0>(segment_max_csr(tensor, torch::cat({segment_offsets, torch::tensor({tensor.size(0)}, segment_offsets.options())}), out));
     #else
         return torch::Tensor();

@@ -1,7 +1,7 @@
 #include "sampler.h"
 #include <parallel_hashmap/phmap.h>
 
-#ifdef MARIUS_OMP
+#ifdef CELERITAS_OMP
     #include "omp.h"
 #endif
 
@@ -248,7 +248,7 @@ torch::Tensor LayeredNeighborSampler::computeDeltaIdsHelperMethod1(torch::Tensor
                                                                    torch::Tensor delta_outgoing_edges,
                                                                    int64_t num_nodes_in_memory) {
     unsigned int num_threads = 1;
-    #ifdef MARIUS_OMP
+    #ifdef CELERITAS_OMP
     #pragma omp parallel
     {
         #pragma omp single
@@ -305,7 +305,7 @@ torch::Tensor LayeredNeighborSampler::computeDeltaIdsHelperMethod1(torch::Tensor
     #pragma omp parallel
     {
 
-        #ifdef MARIUS_OMP
+        #ifdef CELERITAS_OMP
         int tid = omp_get_thread_num();
         #else
         int tid = 0;

@@ -1,4 +1,4 @@
-#ifdef MARIUS_OMP
+#ifdef CELERITAS_OMP
 #include "omp.h"
 #endif
 
@@ -194,7 +194,7 @@ vector<vector<std::pair<int, int>>> randomlyAssignEdgeBucketsToBuffers(vector<ve
 
     // setup seeds
     unsigned int num_threads = 1;
-    #ifdef MARIUS_OMP
+    #ifdef CELERITAS_OMP
     #pragma omp parallel
     {
         #pragma omp single
@@ -210,7 +210,7 @@ vector<vector<std::pair<int, int>>> randomlyAssignEdgeBucketsToBuffers(vector<ve
     #pragma omp parallel
     {
 
-        #ifdef MARIUS_OMP
+        #ifdef CELERITAS_OMP
         unsigned int seed = tid_seeds[omp_get_thread_num()];
         #else
         unsigned int seed = tid_seeds[0];

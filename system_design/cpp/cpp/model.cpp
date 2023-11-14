@@ -1,6 +1,6 @@
 #include "model.h"
 
-#ifdef MARIUS_CUDA
+#ifdef CELERITAS_CUDA
     #include <torch/csrc/cuda/nccl.h>
 #endif
 
@@ -166,7 +166,7 @@ void Model::allReduce() {
             input_gradients[j] = (device_models_[j]->named_parameters()[key].mutable_grad());
         }
 
-        #ifdef MARIUS_CUDA
+        #ifdef CELERITAS_CUDA
             torch::cuda::nccl::all_reduce(input_gradients, input_gradients);
         #endif
     }

@@ -1,7 +1,7 @@
 #include "graph.h"
 #include "utils.h"
 
-#ifdef MARIUS_OMP
+#ifdef CELERITAS_OMP
 #include "omp.h"
 #endif
 
@@ -330,7 +330,7 @@ std::tuple<torch::Tensor, torch::Tensor> CeleritasGraph::getNeighborsForNodeIds(
                 // setup seeds
                 unsigned int num_threads = 1;
 
-                #ifdef MARIUS_OMP
+                #ifdef CELERITAS_OMP
                 #pragma omp parallel
                 {
                     #pragma omp single
@@ -348,7 +348,7 @@ std::tuple<torch::Tensor, torch::Tensor> CeleritasGraph::getNeighborsForNodeIds(
                 if (num_columns == 3) {
                     #pragma omp parallel
                     {
-                        #ifdef MARIUS_OMP
+                        #ifdef CELERITAS_OMP
                         unsigned int seed = tid_seeds[omp_get_thread_num()];
                         #else
                         unsigned int seed = tid_seeds[0];
@@ -389,7 +389,7 @@ std::tuple<torch::Tensor, torch::Tensor> CeleritasGraph::getNeighborsForNodeIds(
                         num_neighbors_accessor, num_neighbors, max_neighbors_size, sorted_list_ptr, dst_sorted_edges_, src_sorted_edges_, \
                         ret_neighbor_id_edges_mem, ret_neighbor_id_edges)
                     {
-                        #ifdef MARIUS_OMP
+                        #ifdef CELERITAS_OMP
                         unsigned int seed = tid_seeds[omp_get_thread_num()];
                         #else
                         unsigned int seed = tid_seeds[0];
