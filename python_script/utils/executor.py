@@ -55,7 +55,7 @@ def run_config(config_path: Path,
     if system.upper() == "CELERITAS":
         if omp_num_threads is not None:
             os.environ["OMP_NUM_THREADS"] = str(omp_num_threads)
-        cmd = "marius_train " + config_path.__str__()
+        cmd = "celeritas_train " + config_path.__str__()
     else:
         raise RuntimeError("Unrecognized system")
 

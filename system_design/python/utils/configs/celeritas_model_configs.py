@@ -647,12 +647,6 @@ class EvaluationConfig:
             raise ValueError("batch_size must be positive")
 
     def merge(self, input_config: DictConfig):
-        """
-        Merges under specified dictionary config into the current configuration object
-        :param input_config: The input configuration dictionary
-        :return: Structured output config
-        """
-
         for key in self.__dict__.keys():
             if key in input_config.keys():
                 if key == "negative_sampling":
@@ -668,16 +662,11 @@ class EvaluationConfig:
         self.__post_init__()
 
 @dataclass
-class MariusConfig:
+class CeleritasConfig:
     model: ModelConfig = ModelConfig()
     storage: StorageConfig = StorageConfig()
     training: TrainingConfig = TrainingConfig()
     evaluation: EvaluationConfig = EvaluationConfig()
-
-    # perform high level validation here
-    # TODO, should we perform file validation here or somewhere else?
-    #  We should check somewhere the self.storage.dataset.base_directory for each learning task to make sure the
-    #  necessary files are present and have the correct sizes
     def __post_init__(self):
         if self.model.learning_task == LearningTask.NODE_CLASSIFICATION:
             # do node classification specific validation
@@ -689,12 +678,8 @@ class MariusConfig:
             pass
 
 
-def type_safe_merge(base_config: MariusConfig, input_config: DictConfig):
-    """
-    Merges under specified dictionary config into the current configuration object
-    :param input_config: The input configuration dictionary
-    :return: Structured output config
-    """
+def type_safe_merge(base_config: CeleritasConfig, input_config: DictConfig):
+
 
     if "model" in input_config.keys():
         base_config.model.merge(input_config.model)
@@ -714,7 +699,7 @@ def type_safe_merge(base_config: MariusConfig, input_config: DictConfig):
 
 
 cs = ConfigStore.instance()
-cs.store(name="base_config", node=MariusConfig)
+cs.store(name="base_config", node=CeleritasConfig)
 
 
 def load_config(input_config_path):
@@ -730,7 +715,7 @@ def load_config(input_config_path):
         input_cfg = hydra.compose(config_name=config_name)
 
     # merge the underspecified input configuration with the fully specified default configuration
-    base_config = MariusConfig()
+    base_config = CeleritasConfig()
     output_config = type_safe_merge(base_config, input_cfg)
 
     # we can then perform validation, and optimization over the fully specified configuration file here before returning
@@ -738,8 +723,8 @@ def load_config(input_config_path):
     return output_config
 
 
-@hydra.main(config_path="config_templates", config_name="marius_config", version_base="1.1")
-def my_app(cfg: MariusConfig) -> None:
+@hydra.main(config_path="config_templates", config_name="celeritas_config", version_base="1.1")
+def my_app(cfg: CeleritasConfig) -> None:
 
     yaml_file = OmegaConf.to_yaml(cfg)
 

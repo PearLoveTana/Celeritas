@@ -44,7 +44,7 @@ PYBIND11_MODULE(_pyceleritas, m) {
     init_initialization(m);
     init_io(m);
     init_loss(m);
-    init_marius(m);
+    init_celeritas(m);
     init_model(m);
     init_regularizer(m);
     init_reporting(m);

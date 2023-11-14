@@ -496,23 +496,23 @@ shared_ptr<torch::optim::Optimizer> getOptimizerForModule(shared_ptr<torch::nn::
             return std::make_shared<torch::optim::SGD>(module->parameters(), optimizer_config->options->learning_rate);
         }
         case OptimizerType::ADAGRAD: {
-            auto marius_options = std::dynamic_pointer_cast<AdagradOptions>(optimizer_config->options);
+            auto celeritas_options = std::dynamic_pointer_cast<AdagradOptions>(optimizer_config->options);
             torch::optim::AdagradOptions torch_options;
-            torch_options.eps(marius_options->eps);
-            torch_options.initial_accumulator_value(marius_options->init_value);
-            torch_options.lr(marius_options->learning_rate);
-            torch_options.lr_decay(marius_options->lr_decay);
-            torch_options.weight_decay(marius_options->weight_decay);
+            torch_options.eps(celeritas_options->eps);
+            torch_options.initial_accumulator_value(celeritas_options->init_value);
+            torch_options.lr(celeritas_options->learning_rate);
+            torch_options.lr_decay(celeritas_options->lr_decay);
+            torch_options.weight_decay(celeritas_options->weight_decay);
             return std::make_shared<torch::optim::Adagrad>(module->parameters(), torch_options);
         }
         case OptimizerType::ADAM: {
-            auto marius_options = std::dynamic_pointer_cast<AdamOptions>(optimizer_config->options);
+            auto celeritas_options = std::dynamic_pointer_cast<AdamOptions>(optimizer_config->options);
             torch::optim::AdamOptions torch_options;
-            torch_options.amsgrad(marius_options->amsgrad);
-            torch_options.eps(marius_options->eps);
-            torch_options.betas({marius_options->beta_1, marius_options->beta_2});
-            torch_options.lr(marius_options->learning_rate);
-            torch_options.weight_decay(marius_options->weight_decay);
+            torch_options.amsgrad(celeritas_options->amsgrad);
+            torch_options.eps(celeritas_options->eps);
+            torch_options.betas({celeritas_options->beta_1, celeritas_options->beta_2});
+            torch_options.lr(celeritas_options->learning_rate);
+            torch_options.weight_decay(celeritas_options->weight_decay);
             return std::make_shared<torch::optim::Adam>(module->parameters(), torch_options);
         }
         default: throw std::invalid_argument("Unrecognized optimizer type");
