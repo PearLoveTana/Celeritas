@@ -1,15 +1,16 @@
 model:
   learning_task: NODE_CLASSIFICATION
   encoder:
-#    use_hashmap_sets: true
     use_incoming_nbrs: true
     use_outgoing_nbrs: true
     layers:
       - train_neighbor_sampling:
+          use_hashmap_sets: true
           type: UNIFORM
           options:
             max_neighbors: 15
         eval_neighbor_sampling:
+          use_hashmap_sets: true
           type: UNIFORM
           options:
             max_neighbors: 15
@@ -18,7 +19,7 @@ model:
         type: GRAPH_SAGE
         options:
           input_dim: 128
-          output_dim: 128
+          output_dim: 256
           aggregator: MEAN
         bias: true
         bias_init:
@@ -36,8 +37,8 @@ model:
           type: GLOROT_NORMAL
         type: GRAPH_SAGE
         options:
-          input_dim: 128
-          output_dim: 128
+          input_dim: 256
+          output_dim: 256
           aggregator: MEAN
         bias: true
         bias_init:
@@ -55,8 +56,8 @@ model:
           type: GLOROT_NORMAL
         type: GRAPH_SAGE
         options:
-          input_dim: 128
-          output_dim: 40
+          input_dim: 256
+          output_dim: 172
           aggregator: MEAN
         bias: true
         bias_init:
@@ -69,15 +70,15 @@ model:
 storage:
   device_type: cuda
   dataset:
-    base_directory: datasets/ogbn_arxiv/
-    num_edges: 1166243
-    num_nodes: 169343
+    base_directory: datasets/ogbn_papers100m/
+    num_edges: 1615685872
+    num_nodes: 111059956
     num_relations: 1
-    num_train: 90941
-    num_valid: 29799
-    num_test: 48603
+    num_train: 1207179
+    num_valid: 125265
+    num_test: 214338
     feature_dim: 128
-    num_classes: 40
+    num_classes: 172
   edges:
     type: FLAT_FILE
   nodes:
@@ -85,20 +86,25 @@ storage:
   features:
     type: PARTITION_BUFFER
     options:
-      num_partitions: 32
-      buffer_capacity: 24
-      prefetching: true
-      fine_to_coarse_ratio: 1
+      num_partitions: 8192
+      buffer_capacity: 3584
+      prefetching: false
+      fine_to_coarse_ratio: 646
       num_cache_partitions: 0
       node_partition_ordering: SEQUENTIAL
-  prefetch: true
+  prefetch: false
   shuffle_input: true
   full_graph_evaluation: true
 training:
   batch_size: 1000
-  num_epochs: 5
+  num_epochs: 10
   pipeline:
-    sync: true
+    sync: false
+    staleness_bound: 8
+    batch_host_queue_size: 8
+    batch_device_queue_size: 8
+    batch_loader_threads: 4
+    batch_transfer_threads: 4
   epochs_per_shuffle: 1
   logs_per_epoch: 10
 evaluation:

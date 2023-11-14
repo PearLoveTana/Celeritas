@@ -5,7 +5,7 @@ from pathlib import Path
 
 def run_ogbn_arxiv(dataset_dir, results_dir, overwrite, enable_dstat, enable_nvidia_smi, show_output, short, num_runs=1):
 
-    dataset_name = "ogbn_arxiv_32"
+    dataset_name = "ogbn_arxiv"
 
     arxiv_config_path = Path("python_script/instance/configs_yaml/ogbn_arxiv/ogbn_arxiv.yaml")
 

@@ -12,11 +12,7 @@ DEFAULT_RESULTS_DIRECTORY = "results/"
 if __name__ == "__main__":
     experiment_dict = {
         "instance_arxiv": run_ogbn_arxiv,
-
-        "papers100m": run_ogbn_papers100m,
-        "papers100m_disk_acc": run_ogbn_papers100m_seq_acc,
-        "papers100m_disk_time": run_ogbn_papers100m_seq_time,
-
+        "instance_papers100m": run_ogbn_paper100M,
     }
 
     parser = argparse.ArgumentParser(description='Reproduce experiments ')

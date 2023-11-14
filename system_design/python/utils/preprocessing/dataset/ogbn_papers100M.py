@@ -6,22 +6,23 @@ from celeritas.utils.preprocessing.converter.to_tensor import TorchEdgeListConve
 from celeritas.utils.configs.constants import PathConstants
 from celeritas.utils.preprocessing.ogb_mapping import remap_ogbn
 from omegaconf import OmegaConf
+import torch
 
 
-class OGBNArxiv(NodeClassificationDataset):
+class OGBNPapers100M(NodeClassificationDataset):
 
     def __init__(self, output_directory: Path):
 
         super().__init__(output_directory)
 
-        self.dataset_name = "ogbn_arxiv"
-        self.dataset_url = "http://snap.stanford.edu/ogb/data/nodeproppred/arxiv.zip"
+        self.dataset_name = "ogbn_papers100M"
+        self.dataset_url = "http://snap.stanford.edu/ogb/data/nodeproppred/papers100M-bin.zip"
 
     def download(self, overwrite=False):
 
-        self.input_edge_list_file = self.output_directory / Path("edge.csv")
-        self.input_node_feature_file = self.output_directory / Path("node-feat.csv")
-        self.input_node_label_file = self.output_directory / Path("node-label.csv")
+        self.input_edge_list_file = self.output_directory / Path("data.npz")    # key: edge_index
+        self.input_node_feature_file = self.output_directory / Path("data.npz") # key: node_feat
+        self.input_node_label_file = self.output_directory / Path("node-label.npz")
         self.input_train_nodes_file = self.output_directory / Path("train.csv")
         self.input_valid_nodes_file = self.output_directory / Path("valid.csv")
         self.input_test_nodes_file = self.output_directory / Path("test.csv")
@@ -44,40 +45,38 @@ class OGBNArxiv(NodeClassificationDataset):
             archive_path = download_url(self.dataset_url, self.output_directory, overwrite)
             extract_file(archive_path, remove_input=False)
 
-            extract_file(self.output_directory / Path("arxiv/raw/edge.csv.gz"))
-            extract_file(self.output_directory / Path("arxiv/raw/node-feat.csv.gz"))
-            extract_file(self.output_directory / Path("arxiv/raw/node-label.csv.gz"))
+            (self.output_directory / Path("papers100M-bin/raw/data.npz")).rename(self.input_node_feature_file)
+            (self.output_directory / Path("papers100M-bin/raw/node-label.npz")).rename(self.input_node_label_file)
 
-            (self.output_directory / Path("arxiv/raw/edge.csv")).rename(self.input_edge_list_file)
-            (self.output_directory / Path("arxiv/raw/node-feat.csv")).rename(self.input_node_feature_file)
-            (self.output_directory / Path("arxiv/raw/node-label.csv")).rename(self.input_node_label_file)
-
-            for file in (self.output_directory / Path("arxiv/split/time")).iterdir():
+            for file in (self.output_directory / Path("papers100M-bin/split/time")).iterdir():
                 extract_file(file)
 
-            for file in (self.output_directory / Path("arxiv/split/time")).iterdir():
+            for file in (self.output_directory / Path("papers100M-bin/split/time")).iterdir():
                 file.rename(self.output_directory / Path(file.name))
 
     def preprocess(self, num_partitions=1, remap_ids=True, splits=None, sequential_train_nodes=False):
+        data_dict = np.load(self.input_edge_list_file)
 
+        input_edges = torch.from_numpy(data_dict["edge_index"].astype(np.int32).transpose())
         train_nodes = np.genfromtxt(self.input_train_nodes_file, delimiter=",").astype(np.int32)
         valid_nodes = np.genfromtxt(self.input_valid_nodes_file, delimiter=",").astype(np.int32)
         test_nodes = np.genfromtxt(self.input_test_nodes_file, delimiter=",").astype(np.int32)
 
         converter = TorchEdgeListConverter(
             output_dir=self.output_directory,
-            train_edges=self.input_edge_list_file,
+            train_edges=input_edges,
             num_partitions=num_partitions,
-            columns=[0, 1],
             remap_ids=remap_ids,
             sequential_train_nodes=sequential_train_nodes,
-            delim=",",
+            format="pytorch",
             known_node_ids=[train_nodes, valid_nodes, test_nodes]
         )
+
         dataset_stats = converter.convert()
 
-        features = np.genfromtxt(self.input_node_feature_file, delimiter=",").astype(np.float32)
-        labels = np.genfromtxt(self.input_node_label_file, delimiter=",").astype(np.int32)
+        features = data_dict["node_feat"].astype(np.float32)
+        labels = np.load(self.input_node_label_file)["node_label"].astype(np.int32)
+        labels[np.isnan(labels)] = -1
 
         if remap_ids:
             node_mapping = np.genfromtxt(self.output_directory / Path(PathConstants.node_mapping_path), delimiter=",")
@@ -99,9 +98,9 @@ class OGBNArxiv(NodeClassificationDataset):
         dataset_stats.num_valid = valid_nodes.shape[0]
         dataset_stats.num_test = test_nodes.shape[0]
         dataset_stats.feature_dim = features.shape[1]
-        dataset_stats.num_classes = 40
+        dataset_stats.num_classes = 172
 
-        dataset_stats.num_nodes = dataset_stats.num_train + dataset_stats.num_valid + dataset_stats.num_test
+        dataset_stats.num_nodes = labels.shape[0]
 
         with open(self.output_directory / Path("dataset.yaml"), "w") as f:
             yaml_file = OmegaConf.to_yaml(dataset_stats)
