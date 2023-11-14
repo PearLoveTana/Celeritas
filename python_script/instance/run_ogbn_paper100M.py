@@ -10,12 +10,12 @@ def run_ogbn_paper100M(dataset_dir, results_dir, overwrite, enable_dstat, enable
     paper100M_config_path = Path("python_script/instance/configs_yaml/ogbn_paper100M/ogbn_paper100M.yaml")
 
     if not (dataset_dir / Path(dataset_name) / Path("edges/train_edges.bin")).exists():
-        print("==== Preprocessing {} =====".format(dataset_name))
+        print("==== Dataset {} is not on local, downloading... =====".format(dataset_name))
         dataset = OGBNPapers100M(dataset_dir / Path(dataset_name))
         dataset.download()
         dataset.preprocess(num_partitions=8192, sequential_train_nodes=True)
     else:
-        print("==== {} already preprocessed =====".format(dataset_name))
+        print("==== {} already existed and preprocessed =====".format(dataset_name))
 
     for i in range(num_runs):
         e.run_config(paper100M_config_path, results_dir / Path("ogbn_papers100m/celeritas_paper100M"),
