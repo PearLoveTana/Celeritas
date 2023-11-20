@@ -1,0 +1,12 @@
+[submodule "system_design/cpp/modules/pybind11"]
+	path = system_design/cpp/modules/pybind11
+	url = https://github.com/pybind/pybind11.git
+[submodule "system_design/cpp/modules/spdlog"]
+	path = system_design/cpp/modules/spdlog
+	url = https://github.com/gabime/spdlog.git
+[submodule "system_design/cpp/modules/googletest"]
+	path = system_design/cpp/modules/googletest
+	url = https://github.com/google/googletest.git
+[submodule "system_design/cpp/modules/parallel-hashmap"]
+	path = system_design/cpp/modules/parallel-hashmap
+	url = https://github.com/greg7mdp/parallel-hashmap.git
