@@ -3,7 +3,7 @@
 
 #include "config.h"
 #include "datatypes.h"
-#include "initialization.h"
+#include "initizlization.h"
 #include "graph.h"
 
 class GNNLayer {

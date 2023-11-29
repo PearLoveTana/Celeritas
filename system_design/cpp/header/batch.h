@@ -3,7 +3,7 @@
 
 #include "datatypes.h"
 #include "graph.h"
-#include "util.h"
+#include "utils.h"
 
 using std::vector;
 

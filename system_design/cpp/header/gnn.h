@@ -1,7 +1,7 @@
 #ifndef CELERITAS_GNN_H
 #define CELERITAS_GNN_H
 
-#include "gnn_layer.h"
+#include "base_gnn_layer.h"
 #include "config.h"
 
 class GeneralGNN : public torch::nn::Cloneable<GeneralGNN> {
