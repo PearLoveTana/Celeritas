@@ -1,7 +1,7 @@
 #include "layer_utils.h"
 
 #ifdef CELERITAS_CUDA
-    #include "GPU/segment_max.h"
+    #include "scatter/segment_max.h"
 #endif
 
 torch::Tensor segment_ids_from_offsets(torch::Tensor segment_offsets, int64_t input_size) {
