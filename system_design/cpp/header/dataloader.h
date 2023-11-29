@@ -9,7 +9,7 @@
 #include "batch.h"
 #include "config.h"
 #include "datatypes.h"
-#include "samplers.h"
+#include "sampler.h"
 #include "graph_storage.h"
 #include "storage.h"
 
